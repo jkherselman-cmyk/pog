@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Presence of Greatness</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .logo {
+            width: 500px;
+            height: auto;
+        }
+        .text {
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <img class="logo" src="Logo.jpeg" alt="Logo">
+    <div class="text">
+        <h1>Coming Soon</h1>
+    </div>
+</body>
+</html>
