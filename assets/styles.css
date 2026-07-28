@@ -51,8 +51,8 @@ a{color:inherit;text-decoration:none}
 .page-hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(rgba(30,38,24,.15),rgba(30,38,24,.85))}
 .page-hero .content{position:relative;z-index:2;padding:2rem 1rem}
-.page-hero h1{color:var(--cream);font-size:2.25rem;font-weight:700}
-.page-hero p{color:rgba(245,239,224,.85);margin-top:1rem;font-size:1.1rem;max-width:640px;margin-left:auto;margin-right:auto}
+.page-hero h1{color:var(--cream);font-size:2.25rem;font-weight:700;text-shadow: 0 0 10px #000000}
+.page-hero p{color:rgba(245,239,224,.85);margin-top:1rem;font-size:1.1rem;max-width:640px;margin-left:auto;margin-right:auto;text-shadow: 0 0 5px #000000}
 @media(min-width:768px){.page-hero h1{font-size:3rem}}
 @media(min-width:1024px){.page-hero h1{font-size:3.75rem}}
 
