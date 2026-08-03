@@ -65,8 +65,8 @@ function renderFooter(){
         <div class="footer-grid">
           <div>
             <h3>POG African Safaris</h3>
-            <p class="tagline">"Arrive as a guest. Hunt among friends. Leave as family."</p>
-            <p style="font-size:.9rem;color:rgba(245,239,224,.7)">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p class="tagline">"Experience the Presence of Greatness"</p>
+            <p style="font-size:.9rem;color:rgba(245,239,224,.7)">Arrive as a guest. Hunt among friends. Leave as family.</p>
           </div>
           <div>
             <h4>Quick Links</h4>

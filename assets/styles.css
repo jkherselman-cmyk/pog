@@ -187,6 +187,6 @@ section.pad{padding:5rem 0}
 .quote-toggle::before{content:"Read full testimonial"}
 .quote-toggle::after{content:" +"}
 .quote:hover .quote-toggle{color:var(--gold-light)}
-.quote[data-expanded="true"] .quote-full{max-height:400px;opacity:1}
+.quote[data-expanded="true"] .quote-full{max-height:800px;opacity:1}
 .quote[data-expanded="true"] .quote-toggle::before{content:"Show less"}
 .quote[data-expanded="true"] .quote-toggle::after{content:""}
