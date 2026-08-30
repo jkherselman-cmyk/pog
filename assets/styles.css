@@ -94,7 +94,7 @@ section.pad{padding:5rem 0}
 .feature-band{position:relative;overflow:hidden;padding:6rem 0;text-align:center}
 .feature-band img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .feature-band .content{position:relative;z-index:2;color:var(--cream)}
-.feature-band::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85));z-index:1}
+.feature-band::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.3));z-index:1}
 .feature-band h2{color:var(--cream);font-size:2rem;position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
 .feature-band p{color:rgba(242,233,226,.9);max-width:720px;margin:1.5rem auto 0;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
 
