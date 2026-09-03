@@ -156,7 +156,9 @@ section.pad{padding:5rem 0}
 .site-footer ul li a:hover{color:var(--taupe)}
 .contact-list li{display:flex;gap:.75rem;align-items:flex-start}
 .contact-list svg{color:var(--taupe);flex-shrink:0;margin-top:.15rem}
-.newsletter-form{display:flex;gap:.5rem}
+.newsletter-form{display:flex;flex-wrap:wrap;gap:.5rem}
+.newsletter-form input[type=text]{flex:1 1 100%}
+.newsletter-form input[type=email]{flex:1 1 60%}
 .newsletter-form input{flex:1;padding:.6rem;background:#171412;border:1px solid var(--border-dark);color:var(--cream);border-radius:.4rem}
 .newsletter-form input::placeholder{color:rgba(242,233,226,.5)}
 .socials{display:flex;gap:1rem;margin-top:.75rem}

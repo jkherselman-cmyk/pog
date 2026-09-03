@@ -83,8 +83,9 @@ function renderFooter(){
           <div>
             <h4>Stay Connected</h4>
             <p style="font-size:.9rem;color:rgba(245,239,224,.7)">Subscribe for safari news and exclusive offers.</p>
-            <form class="newsletter-form" onsubmit="event.preventDefault();this.reset();alert('Thanks for subscribing!')">
-              <input type="email" placeholder="Your email" required>
+            <form class="newsletter-form" data-mailing-form data-source="newsletter">
+              <input type="text" name="name" placeholder="Your name" autocomplete="name">
+              <input type="email" name="email" placeholder="Your email" required autocomplete="email">
               <button class="btn btn-gold" type="submit">Join</button>
             </form>
             <div class="socials">
@@ -156,4 +157,33 @@ document.addEventListener('DOMContentLoaded',()=>{
   initFAQ();
   initGallery();
   initTestimonials();
+  initMailingForms();
 });
+
+// Mailing list forms (footer newsletter + contact enquiry)
+function initMailingForms(){
+  const prefix = location.pathname.includes('/legal/') ? '../' : '';
+  document.querySelectorAll('[data-mailing-form]').forEach(form=>{
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const btn = form.querySelector('button[type=submit], button:not([type])');
+      const label = btn ? btn.textContent : '';
+      if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+      const body = new FormData(form);
+      body.set('source', form.dataset.source || 'website');
+      try{
+        const res = await fetch(prefix + 'subscribe.php', { method:'POST', body });
+        const data = await res.json();
+        if(!data.ok) throw new Error(data.error || 'Something went wrong.');
+        form.reset();
+        alert(form.dataset.source === 'newsletter'
+          ? 'Thanks for subscribing!'
+          : "Thanks — we'll be in touch soon!");
+      }catch(err){
+        alert(err.message || 'Sorry, we could not send that. Please email us directly.');
+      }finally{
+        if(btn){ btn.disabled = false; btn.textContent = label; }
+      }
+    });
+  });
+}
