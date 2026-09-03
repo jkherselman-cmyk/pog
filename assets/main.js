@@ -164,23 +164,48 @@ document.addEventListener('DOMContentLoaded',()=>{
 function initMailingForms(){
   const prefix = location.pathname.includes('/legal/') ? '../' : '';
   document.querySelectorAll('[data-mailing-form]').forEach(form=>{
+    // Spam traps: a hidden honeypot field plus a minimum time-on-form check.
+    const loadedAt = Date.now();
+    const hp = document.createElement('div');
+    hp.className = 'hp-field';
+    hp.setAttribute('aria-hidden','true');
+    hp.innerHTML = '<label>Website<input type="text" name="website" tabindex="-1" autocomplete="new-password"></label>';
+    form.appendChild(hp);
+
+    const status = document.createElement('p');
+    status.className = 'form-status';
+    status.setAttribute('role','status');
+    status.hidden = true;
+    form.appendChild(status);
+    const say = (msg, ok) => { status.hidden = false; status.textContent = msg; status.dataset.ok = ok ? '1' : '0'; };
+
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const btn = form.querySelector('button[type=submit], button:not([type])');
       const label = btn ? btn.textContent : '';
       if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+      status.hidden = true;
       const body = new FormData(form);
       body.set('source', form.dataset.source || 'website');
       try{
+        // Hold the request until the form has been open for at least 3 seconds.
+        const wait = 3200 - (Date.now() - loadedAt);
+        if(wait > 0) await new Promise(r=>setTimeout(r, wait));
+        body.set('elapsed', String(Math.max(3, Math.floor((Date.now() - loadedAt)/1000))));
         const res = await fetch(prefix + 'subscribe.php', { method:'POST', body });
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try{ data = JSON.parse(text); }
+        catch(_){ throw new Error('The server did not respond correctly. Please email us directly at info@pogafricansafaris.com.'); }
         if(!data.ok) throw new Error(data.error || 'Something went wrong.');
         form.reset();
-        alert(form.dataset.source === 'newsletter'
+        say(form.dataset.source === 'newsletter'
           ? 'Thanks for subscribing!'
-          : "Thanks — we'll be in touch soon!");
+          : (data.warning === 'saved_not_emailed'
+              ? "Thanks — we've received your enquiry and will be in touch soon."
+              : "Thanks — we'll be in touch soon!"), true);
       }catch(err){
-        alert(err.message || 'Sorry, we could not send that. Please email us directly.');
+        say(err.message || 'Sorry, we could not send that. Please email us directly.', false);
       }finally{
         if(btn){ btn.disabled = false; btn.textContent = label; }
       }

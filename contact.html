@@ -22,23 +22,23 @@
 <section class="pad reveal"><div class="container"><div class="grid grid-2">
 <div>
 <p class="eyebrow">Get in Touch</p><h2 style="font-size:1.75rem;margin-top:.5rem">Send an Enquiry</h2>
-<form onsubmit="event.preventDefault();this.reset();alert('Thanks — we\'ll be in touch soon!')" style="margin-top:1.5rem">
-  <div class="form-group"><label>Name</label><input required></div>
-  <div class="form-group"><label>Email</label><input type="email" required></div>
-  <div class="form-group"><label>Phone</label><input type="tel"></div>
-  <div class="form-group"><label>Interested Package</label><select><option>Plains Game — 5 Day</option><option>Big Game — 7 Day</option><option>Family & Observer — 10 Day</option><option>Custom</option></select></div>
-  <div class="form-group"><label>Message</label><textarea></textarea></div>
+<form data-mailing-form data-source="contact" style="margin-top:1.5rem">
+  <div class="form-group"><label>Name</label><input name="name" required></div>
+  <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+  <div class="form-group"><label>Phone</label><input type="tel" name="phone"></div>
+  <div class="form-group"><label>Interested Package</label><select name="package"><option>Plains Game — 5 Day</option><option>Big Game — 7 Day</option><option>Family & Observer — 10 Day</option><option>Custom</option></select></div>
+  <div class="form-group"><label>Message</label><textarea name="message"></textarea></div>
   <button class="btn btn-gold btn-lg" type="submit">Send Enquiry</button>
 </form>
 </div>
 <div>
 <p class="eyebrow">Reach Us Directly</p><h2 style="font-size:1.75rem;margin-top:.5rem">Contact Details</h2>
-<ul class="contact-list" style="margin-top:1.5rem;list-style:none;color:var(--muted)">
+<ul class="contact-list" style="margin-top:1.5rem;list-style:none;color:var(--ink-soft)">
   <li style="display:flex;gap:.75rem;margin-bottom:1rem"><strong style="color:var(--earth-dark)">Email:</strong> info@poghunting.co.za</li>
   <li style="display:flex;gap:.75rem;margin-bottom:1rem"><strong style="color:var(--earth-dark)">Phone:</strong> +27 12 345 6789</li>
   <li style="display:flex;gap:.75rem;margin-bottom:1rem"><strong style="color:var(--earth-dark)">Location:</strong> Eastern Cape, South Africa</li>
 </ul>
-<div style="margin-top:2rem"><img src="assets/photos/fire.gif" alt="fire" style="border-radius:.6rem"></div>
+<div style="margin-top:2rem"><img src="assets/photos/fire.gif" alt="Fire" style="border-radius:.6rem"></div>
 </div>
 </div></div></section>
 

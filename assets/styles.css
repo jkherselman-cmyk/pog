@@ -196,3 +196,12 @@ section.pad{padding:5rem 0}
 .quote[data-expanded="true"] .quote-full{max-height:400px;opacity:1}
 .quote[data-expanded="true"] .quote-toggle::before{content:"Show less"}
 .quote[data-expanded="true"] .quote-toggle::after{content:""}
+
+/* Honeypot field — hidden from humans, visible to bots */
+.hp-field{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden;opacity:0}
+
+.form-status{margin-top:.75rem;font-size:.95rem;font-weight:600;color:var(--cream)}
+.form-status[data-ok='1']{color:#2f7d32}
+.form-status[data-ok='0']{color:#a3301f}
+footer .form-status[data-ok='1']{color:var(--taupe,#b69f8f)}
+footer .form-status[data-ok='0']{color:#e29a8a}
