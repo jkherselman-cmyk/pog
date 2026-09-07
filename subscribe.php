@@ -46,7 +46,8 @@ $package = $clean('package', 120);
 $message = $clean('message', 2000);
 $source = $clean('source', 40);
 
-if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+$emailPattern = '/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/';
+if ($email === '' || !preg_match($emailPattern, $email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     fail('Please enter a valid email address.');
 }
 if (!in_array($source, ['newsletter', 'contact'], true)) {
@@ -63,27 +64,44 @@ if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
     fail('Could not create data directory.', 500);
 }
 
+// Skip storing an address that is already on the list.
+$alreadyStored = false;
+if (file_exists(MAILING_LIST_CSV)) {
+    $rh = fopen(MAILING_LIST_CSV, 'r');
+    if ($rh) {
+        flock($rh, LOCK_SH);
+        while (($row = fgetcsv($rh, 0, ',', '"', '\\')) !== false) {
+            if (isset($row[2]) && strcasecmp(trim($row[2]), $email) === 0) {
+                $alreadyStored = true;
+                break;
+            }
+        }
+        flock($rh, LOCK_UN);
+        fclose($rh);
+    }
+}
+
 $isNew = !file_exists(MAILING_LIST_CSV) || filesize(MAILING_LIST_CSV) === 0;
-$fh = fopen(MAILING_LIST_CSV, 'a');
-if (!$fh) {
-    fail('Could not open mailing list.', 500);
+if (!$alreadyStored) {
+    $fh = fopen(MAILING_LIST_CSV, 'a');
+    if (!$fh) {
+        fail('Could not open mailing list.', 500);
+    }
+    flock($fh, LOCK_EX);
+    if ($isNew) {
+        fputcsv($fh, ['Date', 'Name', 'Email', 'Phone', 'Source'], ',', '"', '\\');
+    }
+    fputcsv($fh, array_map($safe, [
+        gmdate('Y-m-d H:i:s') . ' UTC',
+        $name,
+        $email,
+        $phone,
+        $source,
+    ]), ',', '"', '\\');
+    fflush($fh);
+    flock($fh, LOCK_UN);
+    fclose($fh);
 }
-flock($fh, LOCK_EX);
-if ($isNew) {
-    fputcsv($fh, ['Date', 'Name', 'Email', 'Phone', 'Package', 'Message', 'Source'], ',', '"', '\\');
-}
-fputcsv($fh, array_map($safe, [
-    gmdate('Y-m-d H:i:s') . ' UTC',
-    $name,
-    $email,
-    $phone,
-    $package,
-    $message,
-    $source,
-]), ',', '"', '\\');
-fflush($fh);
-flock($fh, LOCK_UN);
-fclose($fh);
 
 // ── Email the enquiry through to the office ──────────────────────────────────
 if ($source === 'contact') {
@@ -100,19 +118,21 @@ if ($source === 'contact') {
     $body .= str_repeat('=', 40) . "\nSent via the POG African Safaris contact form.\n";
 
     $replyName = $name !== '' ? $name : 'Website enquiry';
+
+    // Mail headers
+    $to      = "jkherselman@gmail.com";
+    $subject = 'New Enquiry from POG African Safaris' . ($name !== '' ? " - $name" : '');
     $headers = implode("\r\n", [
         'From: POG African Safaris <' . ENQUIRY_FROM . '>',
         'Reply-To: ' . $replyName . ' <' . $email . '>',
         'Content-Type: text/plain; charset=UTF-8',
     ]);
-    $subject = 'New Enquiry from POG African Safaris' . ($name !== '' ? " - $name" : '');
 
-    $sent = function_exists('mail') ? @mail(ENQUIRY_TO, $subject, $body, $headers) : false;
-    if (!$sent) {
-        // The enquiry is safely stored either way - never fail the visitor's submission.
-        @error_log('POG contact form: mail() failed for ' . $email);
-        echo json_encode(['ok' => true, 'warning' => 'saved_not_emailed']);
-        exit;
+    if (mail($to, $subject, $body, $headers)) {
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Failed to send your enquiry. Please try again or contact us directly.']);
     }
 }
 

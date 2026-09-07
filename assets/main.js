@@ -196,7 +196,7 @@ function initMailingForms(){
         const text = await res.text();
         let data;
         try{ data = JSON.parse(text); }
-        catch(_){ throw new Error('The server did not respond correctly. Please email us directly at info@pogafricansafaris.com.'); }
+        catch(_){ throw new Error('The server did not respond correctly. Please email us directly at info@poghunting.co.za.'); }
         if(!data.ok) throw new Error(data.error || 'Something went wrong.');
         form.reset();
         say(form.dataset.source === 'newsletter'

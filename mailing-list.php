@@ -31,7 +31,7 @@ if ($authed && isset($_GET['download'])) {
     if (file_exists(MAILING_LIST_CSV)) {
         readfile(MAILING_LIST_CSV);
     } else {
-        echo "Date,Name,Email,Phone,Package,Message,Source\n";
+        echo "Date,Name,Email,Phone,Source\n";
     }
     exit;
 }
@@ -44,7 +44,7 @@ if ($authed && file_exists(MAILING_LIST_CSV)) {
     }
     fclose($fh);
 }
-$head = $rows ? array_shift($rows) : ['Date', 'Name', 'Email', 'Phone', 'Package', 'Message', 'Source'];
+$head = $rows ? array_shift($rows) : ['Date', 'Name', 'Email', 'Phone', 'Source'];
 $rows = array_reverse($rows);
 $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
