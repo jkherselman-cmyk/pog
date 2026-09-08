@@ -109,7 +109,7 @@ function initReveal(){
   if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('visible'));return;}
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
-  },{threshold:.15});
+  },{threshold:0,rootMargin:'0px 0px -10% 0px'});
   els.forEach(e=>io.observe(e));
 }
 
