@@ -65,8 +65,8 @@ function renderFooter(){
         <div class="footer-grid">
           <div>
             <h3>POG African Safaris</h3>
-            <p class="tagline">"Experience the Presence of Greatness"</p>
-            <p style="font-size:.9rem;color:rgba(245,239,224,.7)">Arrive as a guest. Hunt among friends. Leave as family.</p>
+            <p class="tagline">"Arrive as a guest. Hunt among friends. Leave as family."</p>
+            <p style="font-size:.9rem;color:rgba(245,239,224,.7)">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
           </div>
           <div>
             <h4>Quick Links</h4>
@@ -75,7 +75,7 @@ function renderFooter(){
           <div>
             <h4>Contact Us</h4>
             <ul class="contact-list">
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>info@poghunting.co.za</span></li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>info@pogafricansafaris.com</span></li>
               <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg><span>+27 12 345 6789</span></li>
               <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Eastern Cape, South Africa</span></li>
             </ul>
@@ -133,18 +133,13 @@ function initTestimonials(){
 
 // Gallery
 function initGallery(){
-  const grid = document.getElementById('gallery-grid');
-  if(!grid) return;
-  const imgs = grid.querySelectorAll('img');
+  const grids = document.querySelectorAll('.gallery-grid');
+  if(!grids.length) return;
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightbox-img');
-  imgs.forEach(img=>img.addEventListener('click',()=>{lbImg.src=img.src;lb.classList.add('open');}));
-  document.querySelectorAll('.filter-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.cat;
-      imgs.forEach(img=>img.style.display = (cat==='all'||img.dataset.cat===cat)?'block':'none');
+  grids.forEach(grid=>{
+    grid.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('click',()=>{lbImg.src=img.src;lb.classList.add('open');});
     });
   });
 }
@@ -196,8 +191,9 @@ function initMailingForms(){
         const text = await res.text();
         let data;
         try{ data = JSON.parse(text); }
-        catch(_){ throw new Error('The server did not respond correctly. Please email us directly at info@poghunting.co.za.'); }
-        if(!data.ok) throw new Error(data.error || 'Something went wrong.');
+        catch(_){ throw new Error('The server did not respond correctly (' + res.status + '). Please email us directly at info@pogafricansafaris.com.'); }
+        if(!data.ok) throw new Error((data.error || 'Something went wrong.') + (data.detail ? ' [' + data.detail + ']' : ''));
+        if(data.detail) console.warn('Mail notice:', data.detail);
         form.reset();
         say(form.dataset.source === 'newsletter'
           ? 'Thanks for subscribing!'

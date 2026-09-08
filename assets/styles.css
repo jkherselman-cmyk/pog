@@ -52,7 +52,7 @@ a{color:inherit;text-decoration:none}
 .page-hero{position:relative;min-height:40vh;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center}
 @media(min-width:768px){.page-hero{min-height:50vh}}
 .page-hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.2))}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.82))}
 .page-hero .content{position:relative;z-index:2;padding:2rem 1rem}
 .page-hero h1{color:var(--cream);font-size:2.25rem;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
 .page-hero p{color:rgba(242,233,226,.88);margin-top:1rem;font-size:1.1rem;max-width:640px;margin-left:auto;margin-right:auto;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
@@ -94,7 +94,7 @@ section.pad{padding:5rem 0}
 .feature-band{position:relative;overflow:hidden;padding:6rem 0;text-align:center}
 .feature-band img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .feature-band .content{position:relative;z-index:2;color:var(--cream)}
-.feature-band::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.3));z-index:1}
+.feature-band::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85));z-index:1}
 .feature-band h2{color:var(--cream);font-size:2rem;position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
 .feature-band p{color:rgba(242,233,226,.9);max-width:720px;margin:1.5rem auto 0;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.75),0 0 16px rgba(0,0,0,.55)}
 
@@ -104,6 +104,8 @@ section.pad{padding:5rem 0}
 @media(min-width:1024px){.gallery-grid{grid-template-columns:repeat(4,1fr)}}
 .gallery-grid img{width:100%;height:220px;object-fit:cover;border-radius:.4rem;cursor:pointer;transition:transform .3s}
 .gallery-grid img:hover{transform:scale(1.03)}
+.gallery-section{margin-bottom:3rem}
+.gallery-section h2{margin:0 0 1rem;font-size:1.8rem;text-align:center;}
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:2rem}
 .filter-btn{padding:.5rem 1rem;border:1px solid var(--border);background:transparent;border-radius:999px;cursor:pointer;font-family:inherit;color:var(--ink-soft)}
 .filter-btn:hover{border-color:var(--rust);color:var(--rust)}
@@ -205,3 +207,11 @@ section.pad{padding:5rem 0}
 .form-status[data-ok='0']{color:#a3301f}
 footer .form-status[data-ok='1']{color:var(--taupe,#b69f8f)}
 footer .form-status[data-ok='0']{color:#e29a8a}
+
+/* Home page logo watermark */
+body.home::before{content:'';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:75vw;height:75vw;background:url('Logo.png') center/contain no-repeat;opacity:.35;pointer-events:none;z-index:0}
+body.home main{position:relative;z-index:1}
+@media (max-width:700px){body.home::before{width:75vw;height:75vw}}
+/* Let the watermark show through solid section bands on the home page */
+body.home .bg-secondary{background:color-mix(in srgb, var(--taupe-dark) 70%, transparent)}
+
