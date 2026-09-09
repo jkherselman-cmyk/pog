@@ -67,7 +67,7 @@ $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
   .ml-err{color:#a65e2c;font-size:.9rem;margin-top:.75rem}
 </style>
 </head>
-<body>
+<body class="home">
 <div id="site-header"></div>
 <main class="ml-wrap">
 <?php if (!$authed): ?>
