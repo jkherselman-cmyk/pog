@@ -167,6 +167,13 @@ function initMailingForms(){
     hp.innerHTML = '<label>Website<input type="text" name="website" tabindex="-1" autocomplete="new-password"></label>';
     form.appendChild(hp);
 
+    // Stamp the time the form was loaded (checked server-side to detect bots).
+    const stamp = document.createElement('input');
+    stamp.type = 'hidden';
+    stamp.name = 'form_loaded';
+    stamp.value = String(Math.floor(loadedAt / 1000));
+    form.appendChild(stamp);
+
     const status = document.createElement('p');
     status.className = 'form-status';
     status.setAttribute('role','status');
@@ -176,6 +183,18 @@ function initMailingForms(){
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
+
+      // Field validation
+      let valid = true;
+      form.querySelectorAll('[required]').forEach(el=>{
+        if(!el.value.trim()){
+          valid = false;
+          el.style.borderColor = '#c0392b';
+          el.addEventListener('input', ()=>{ el.style.borderColor = ''; }, { once:true });
+        }
+      });
+      if(!valid) return;
+
       const btn = form.querySelector('button[type=submit], button:not([type])');
       const label = btn ? btn.textContent : '';
       if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
@@ -186,25 +205,19 @@ function initMailingForms(){
         // Hold the request until the form has been open for at least 3 seconds.
         const wait = 3200 - (Date.now() - loadedAt);
         if(wait > 0) await new Promise(r=>setTimeout(r, wait));
-        body.set('elapsed', String(Math.max(3, Math.floor((Date.now() - loadedAt)/1000))));
         const res = await fetch(prefix + 'subscribe.php', { method:'POST', body });
-        const text = await res.text();
-        let data;
-        try{ data = JSON.parse(text); }
-        catch(_){ throw new Error('The server did not respond correctly (' + res.status + '). Please email us directly at info@pogafricansafaris.com.'); }
-        if(!data.ok) throw new Error((data.error || 'Something went wrong.') + (data.detail ? ' [' + data.detail + ']' : ''));
-        if(data.detail) console.warn('Mail notice:', data.detail);
+        const result = await res.json();
+        if(!result.success) throw new Error(result.message || 'Something went wrong. Please try again.');
         form.reset();
         say(form.dataset.source === 'newsletter'
           ? 'Thanks for subscribing!'
-          : (data.warning === 'saved_not_emailed'
-              ? "Thanks — we've received your enquiry and will be in touch soon."
-              : "Thanks — we'll be in touch soon!"), true);
+          : "Thanks — we'll be in touch soon!", true);
       }catch(err){
-        say(err.message || 'Sorry, we could not send that. Please email us directly.', false);
+        say(err.message || 'Could not send your enquiry. Please try again or contact us directly.', false);
       }finally{
         if(btn){ btn.disabled = false; btn.textContent = label; }
       }
     });
   });
+
 }

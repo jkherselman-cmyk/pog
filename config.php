@@ -8,6 +8,6 @@ define('MAILING_LIST_PASSWORD', 'ChangeMe-POG-2026');
 define('MAILING_LIST_CSV', __DIR__ . '/data/mailing-list.csv');
 
 // Where contact-form enquiries are emailed.
-define('ENQUIRY_TO', 'jkherselman@gmail.com');
+define('ENQUIRY_TO', 'info@poghunting.co.za');
 // Envelope sender — must be a mailbox on your own domain for good deliverability.
 define('ENQUIRY_FROM', 'info@poghunting.co.za');

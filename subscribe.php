@@ -1,59 +1,71 @@
 <?php
 // Receives footer newsletter signups and contact-form enquiries,
-// appends them to the mailing list CSV.
+// saves them to the mailing list CSV and emails enquiries to the office.
 require __DIR__ . '/config.php';
 
-ini_set('display_errors', '0');
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+header('Content-Type: application/json');
 
-header('Content-Type: application/json; charset=utf-8');
-
-function fail($msg, $code = 400) {
-    http_response_code($code);
-    echo json_encode(['ok' => false, 'error' => $msg]);
+// Only accept POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed.']);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    fail('Method not allowed', 405);
+// Sanitise helper
+function clean(string $val): string {
+    return htmlspecialchars(strip_tags(trim($val)), ENT_QUOTES, 'UTF-8');
 }
 
-// ── Spam protection: honeypot + minimum fill time ────────────────────────────
-// Bots fill every field, including the hidden one.
-if (trim((string) ($_POST['website'] ?? '')) !== '') {
-    fail('Submission rejected.');
-}
-// Bots submit instantly; the page script holds real submissions back for 3 seconds.
-$elapsed = isset($_POST['elapsed']) ? (int) $_POST['elapsed'] : -1;
-if ($elapsed >= 0 && $elapsed < 3) {
-    fail('Submission rejected.');
-}
-if ($elapsed < 0) {
-    // No timing info at all (script bypassed) - treat as a bot.
-    fail('Submission rejected.');
+// ── Spam protection: honeypot + time check ───────────────────────────────────
+// Reject if the honeypot field was filled (bot behaviour)
+if (!empty($_POST['website'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Submission rejected.']);
+    exit;
 }
 
-$clean = function ($key, $max = 500) {
-    $v = isset($_POST[$key]) ? trim((string) $_POST[$key]) : '';
-    $v = str_replace(["\r", "\n"], ' ', $v);
-    return mb_substr($v, 0, $max);
-};
-
-$email = $clean('email', 255);
-$name = $clean('name', 120);
-$phone = $clean('phone', 60);
-$package = $clean('package', 120);
-$message = $clean('message', 2000);
-$source = $clean('source', 40);
-
-$emailPattern = '/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/';
-if ($email === '' || !preg_match($emailPattern, $email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    fail('Please enter a valid email address.');
+// Reject if the form was submitted in under 3 seconds (bot behaviour)
+$form_loaded = (int)($_POST['form_loaded'] ?? 0);
+if ($form_loaded === 0 || (time() - $form_loaded) < 3) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Submission rejected.']);
+    exit;
 }
+
+// ── Collect and sanitise inputs ──────────────────────────────────────────────
+$name   = clean($_POST['name'] ?? '');
+$email  = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+$phone  = clean($_POST['phone'] ?? '');
+$source = clean($_POST['source'] ?? '');
 if (!in_array($source, ['newsletter', 'contact'], true)) {
     $source = 'website';
 }
 
+// Server-side validation
+$emailPattern = '/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/';
+if ($email === '' || !preg_match($emailPattern, $email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Please enter a valid email address.']);
+    exit;
+}
+
+if ($source === 'contact' && $name === '') {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
+    exit;
+}
+
+// Prevent email header injection
+foreach ([$name, $email, $phone] as $field) {
+    if (preg_match('/[\r\n]/', $field)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid input detected.']);
+        exit;
+    }
+}
+
+// ── Save to the mailing list CSV ─────────────────────────────────────────────
 // Guard against CSV formula injection when the file is opened in Excel.
 $safe = function ($v) {
     return (isset($v[0]) && strpos("=+-@\t\r", $v[0]) !== false) ? "'" . $v : $v;
@@ -61,7 +73,9 @@ $safe = function ($v) {
 
 $dir = dirname(MAILING_LIST_CSV);
 if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-    fail('Could not create data directory.', 500);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Could not create data directory.']);
+    exit;
 }
 
 // Skip storing an address that is already on the list.
@@ -81,11 +95,13 @@ if (file_exists(MAILING_LIST_CSV)) {
     }
 }
 
-$isNew = !file_exists(MAILING_LIST_CSV) || filesize(MAILING_LIST_CSV) === 0;
 if (!$alreadyStored) {
+    $isNew = !file_exists(MAILING_LIST_CSV) || filesize(MAILING_LIST_CSV) === 0;
     $fh = fopen(MAILING_LIST_CSV, 'a');
     if (!$fh) {
-        fail('Could not open mailing list.', 500);
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Could not open mailing list.']);
+        exit;
     }
     flock($fh, LOCK_EX);
     if ($isNew) {
@@ -106,25 +122,24 @@ if (!$alreadyStored) {
 // ── Email the enquiry through to the office ──────────────────────────────────
 if ($source === 'contact') {
     $divider = str_repeat('-', 40);
-    $body  = "NEW ENQUIRY - POG AFRICAN SAFARIS\n" . str_repeat('=', 40) . "\n\n";
-    $body .= "CONTACT DETAILS\n$divider\n";
-    $body .= "Name:     " . ($name ?: '-') . "\n";
+
+    $body  = "NEW ENQUIRY - POG AFRICAN SAFARIS\n";
+    $body .= str_repeat('=', 40) . "\n\n";
+
+    $body .= "CONTACT DETAILS\n";
+    $body .= "$divider\n";
+    $body .= "Name:     $name\n";
     $body .= "Email:    $email\n";
     $body .= "Phone:    " . ($phone ?: '-') . "\n\n";
-    $body .= "ENQUIRY\n$divider\n";
-    $body .= "Package:  " . ($package ?: '-') . "\n\n";
-    $body .= "MESSAGE\n$divider\n";
-    $body .= ($message ?: 'No message provided.') . "\n\n";
-    $body .= str_repeat('=', 40) . "\nSent via the POG African Safaris contact form.\n";
 
-    $replyName = $name !== '' ? $name : 'Website enquiry';
+    $body .= str_repeat('=', 40) . "\n";
+    $body .= "Sent via the POG African Safaris contact form.\n";
 
-    // Mail headers
-    $to      = "jkherselman@gmail.com";
-    $subject = 'New Enquiry from POG African Safaris' . ($name !== '' ? " - $name" : '');
+    $to      = ENQUIRY_TO;
+    $subject = "New Enquiry from POG African Safaris - $name";
     $headers = implode("\r\n", [
         'From: POG African Safaris <' . ENQUIRY_FROM . '>',
-        'Reply-To: ' . $replyName . ' <' . $email . '>',
+        "Reply-To: $name <$email>",
         'Content-Type: text/plain; charset=UTF-8',
     ]);
 
@@ -134,6 +149,7 @@ if ($source === 'contact') {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Failed to send your enquiry. Please try again or contact us directly.']);
     }
+    exit;
 }
 
-echo json_encode(['ok' => true]);
+echo json_encode(['success' => true]);
