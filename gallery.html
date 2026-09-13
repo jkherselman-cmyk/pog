@@ -47,9 +47,11 @@
 <div class="gallery-section">
     <h2>Lodge</h2>
     <div class="gallery-grid">
-        <video muted loop playsinline preload="none" loading="lazy">
-            <source src="assets/videos/acc_vid01.mp4" type="video/webm">
-        </video>
+        <div class="video-tile" data-video="assets/videos/acc_vid01.mp4">
+            <video muted loop playsinline preload="none" loading="lazy" poster="assets/photos/accommodation31.jpg" src="assets/videos/acc_vid01.mp4">
+            </video>
+            <span class="play-badge" aria-hidden="true">&#9654;</span>
+        </div>
         <img src="assets/photos/accommodation04.jpg" alt="" data-cat="lodge">
         <img src="assets/photos/accommodation08.jpg" alt="" data-cat="lodge">
         <img src="assets/photos/accommodation11.jpg" alt="" data-cat="lodge">
@@ -85,7 +87,7 @@
 </div></section>
 </main>
 <div id="site-footer"></div>
-<div id="lightbox" class="lightbox" onclick="closeLightbox()"><button class="close" aria-label="Close">&times;</button><img id="lightbox-img" alt=""></div>
+<div id="lightbox" class="lightbox" onclick="closeLightbox()"><button class="close" aria-label="Close">&times;</button><img id="lightbox-img" alt=""><video id="lightbox-video" controls playsinline preload="none"></video></div>
 <script src="assets/main.js"></script>
 </body>
 </html>
