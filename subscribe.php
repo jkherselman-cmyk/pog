@@ -38,6 +38,9 @@ $name   = clean($_POST['name'] ?? '');
 $email  = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
 $phone  = clean($_POST['phone'] ?? '');
 $source = clean($_POST['source'] ?? '');
+// Emailed through with the enquiry but deliberately NOT saved to the CSV.
+$package = clean($_POST['package'] ?? '');
+$message = clean($_POST['message'] ?? '');
 if (!in_array($source, ['newsletter', 'contact'], true)) {
     $source = 'website';
 }
@@ -131,6 +134,11 @@ if ($source === 'contact') {
     $body .= "Name:     $name\n";
     $body .= "Email:    $email\n";
     $body .= "Phone:    " . ($phone ?: '-') . "\n\n";
+
+    $body .= "ENQUIRY\n";
+    $body .= "$divider\n";
+    $body .= "Package:  " . ($package !== '' ? $package : '-') . "\n\n";
+    $body .= "Message:\n" . ($message !== '' ? $message : '-') . "\n\n";
 
     $body .= str_repeat('=', 40) . "\n";
     $body .= "Sent via the POG African Safaris contact form.\n";
