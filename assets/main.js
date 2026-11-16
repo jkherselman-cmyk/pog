@@ -92,10 +92,10 @@ come together in the Presence of Greatness.</p>
               <input type="email" name="email" placeholder="Your email" required autocomplete="email">
               <button class="btn btn-gold" type="submit">Join</button>
             </form>
-            <div class="socials">
+            <!--div class="socials">
               <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 10-11.6 9.9v-7h-2v-3h2V9.5C10.4 7.5 11.6 6.4 13.4 6.4c.9 0 1.8.2 1.8.2V8.5h-1c-1 0-1.3.6-1.3 1.3V12h2.2l-.4 3h-1.9v7A10 10 0 0022 12z"/></svg></a>
               <a href="#" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4A4 4 0 1112.6 8 4 4 0 0116 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-            </div>
+            </div-->
           </div>
         </div>
         <div class="footer-bottom">
